@@ -22,6 +22,26 @@ Documentation of the various scripts can be found on the related articles: [Medi
 * [LasPy](https://laspy.readthedocs.io/en/latest/) - A Python library for reading, modifying and writing LAS files. 
 * [Matplotlib](https://matplotlib.org/) - A library for creating static, animated, and interactive visualizations in Python.
 
+## Loan Portfolio Visualization
+
+The repository now includes a small example showing how point-cloud tools can visualize
+loan portfolio metrics. The `loan_portfolio_visualizer.py` script reads a CSV file
+containing `loanbalance`, `loanrate`, `loanaddedOrRemovedFlag`, and
+`loantermOrAgeInMonths` columns. Each loan is mapped to a 3D point where:
+
+* **X** = loan term or age in months
+* **Y** = balance
+* **Z** = interest rate
+
+Points are colored green for newly added loans and red for loans that have been
+removed. To try it out, run:
+
+```bash
+python CODE/loan_portfolio_visualizer.py DATA/loan_data_example.csv
+```
+
+This will open an interactive Open3D window displaying the loan portfolio.
+
 ## Acknowledgments
 
 These tools are developed after my PhD, in order to try and support developers & researchers in their point cloud processing endavour, from scratch.

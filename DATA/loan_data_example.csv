@@ -1,0 +1,7 @@
+loanbalance,loanrate,loanaddedOrRemovedFlag,loantermOrAgeInMonths
+10000,5.5,added,60
+8000,4.2,added,48
+5000,6.0,removed,36
+15000,3.8,added,72
+4000,5.0,removed,24
+
