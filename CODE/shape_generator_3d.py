@@ -14,7 +14,7 @@ def generate_random_point_cloud(num_points=5000, num_shapes=1):
     points = []
     
     # Generate multiple shapes
-    for * in range(num*shapes):
+    for _ in range(num_shapes):
         # Randomly choose a shape type
         shape_type = np.random.choice(['sphere', 'cube', 'plane'])
         # Calculate number of points for this shape
@@ -55,5 +55,4 @@ point_cloud = generate_random_point_cloud(10000, 8)
 pcd = o3d.geometry.PointCloud()
 pcd.points = o3d.utility.Vector3dVector(point_cloud)
 
-# Visualize the point cloud
-o3d.visualization.draw_geometries([pcd])
+# Visualize the point cloudo3d.visualization.draw_geometries([pcd])
