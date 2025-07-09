@@ -3,6 +3,11 @@ import csv
 import numpy as np
 import open3d as o3d
 
+"""Visualize loan portfolio data in 3D using Open3D.
+
+This script requires the :mod:`open3d` package to be installed.
+"""
+
 
 def load_loans(csv_path):
     """Load loan data from a CSV file."""

@@ -8,7 +8,11 @@ A computer with internet access, and (optionnally), a Gmail and GDrive account t
 
 ## Installing
 
-Nothing to install.
+Install the required visualization library before running the examples:
+
+```bash
+pip install open3d
+```
 
 ## Documentation
 
