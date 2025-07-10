@@ -77,24 +77,43 @@ def _add_spheres_to_visualizer(
             vis.add_3d_label(sphere.get_center(), str(idx + 1))
 
 
-def _create_grid(size: float = 1.0, divisions: int = 10) -> o3d.geometry.LineSet:
-    """Return a faint grid in the X-Y plane."""
+def _create_grid(
+    size: float = 1.0, divisions: int = 10, plane: str = "xy"
+) -> o3d.geometry.LineSet:
+    """Return a faint grid in one of the principal planes."""
+    plane = plane.lower()
+    if plane not in ("xy", "xz", "yz"):
+        raise ValueError("plane must be 'xy', 'xz', or 'yz'")
     points = []
     lines = []
     step = size / divisions
     origin = -size / 2
 
-    # Lines parallel to the X-axis
+    # Lines parallel to the first axis in the plane
     for i in range(divisions + 1):
-        start = [origin, origin + i * step, 0.0]
-        end = [origin + size, origin + i * step, 0.0]
+        if plane == "xy":
+            start = [origin, origin + i * step, 0.0]
+            end = [origin + size, origin + i * step, 0.0]
+        elif plane == "xz":
+            start = [origin, 0.0, origin + i * step]
+            end = [origin + size, 0.0, origin + i * step]
+        else:  # yz
+            start = [0.0, origin, origin + i * step]
+            end = [0.0, origin + size, origin + i * step]
         points.extend([start, end])
         lines.append([len(points) - 2, len(points) - 1])
 
-    # Lines parallel to the Y-axis
+    # Lines parallel to the second axis in the plane
     for i in range(divisions + 1):
-        start = [origin + i * step, origin, 0.0]
-        end = [origin + i * step, origin + size, 0.0]
+        if plane == "xy":
+            start = [origin + i * step, origin, 0.0]
+            end = [origin + i * step, origin + size, 0.0]
+        elif plane == "xz":
+            start = [origin + i * step, 0.0, origin]
+            end = [origin + i * step, 0.0, origin + size]
+        else:  # yz
+            start = [0.0, origin + i * step, origin]
+            end = [0.0, origin + i * step, origin + size]
         points.extend([start, end])
         lines.append([len(points) - 2, len(points) - 1])
 
@@ -121,14 +140,18 @@ def main() -> None:
     vis.create_window(window_name="Loan Portfolio")
     _add_spheres_to_visualizer(vis, spheres)
 
-    grid = _create_grid(size=1.0, divisions=20)
+    grid_xy = _create_grid(size=1.0, divisions=20, plane="xy")
+    grid_xz = _create_grid(size=1.0, divisions=20, plane="xz")
+    grid_yz = _create_grid(size=1.0, divisions=20, plane="yz")
     axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2)
-    vis.add_geometry(grid)
+    vis.add_geometry(grid_xy)
+    vis.add_geometry(grid_xz)
+    vis.add_geometry(grid_yz)
     vis.add_geometry(axis)
     if hasattr(vis, "add_3d_label"):
-        vis.add_3d_label([0.25, 0, 0], "X")
-        vis.add_3d_label([0, 0.25, 0], "Y")
-        vis.add_3d_label([0, 0, 0.25], "Z")
+        vis.add_3d_label([0.25, 0, 0], "Term/Age")
+        vis.add_3d_label([0, 0.25, 0], "Balance")
+        vis.add_3d_label([0, 0, 0.25], "Rate")
 
     vis.poll_events()
     vis.update_renderer()
@@ -167,14 +190,18 @@ def main() -> None:
 
             spheres = loans_to_spheres(new_loans)
             _add_spheres_to_visualizer(vis, spheres)
-            grid = _create_grid(size=1.0, divisions=20)
+            grid_xy = _create_grid(size=1.0, divisions=20, plane="xy")
+            grid_xz = _create_grid(size=1.0, divisions=20, plane="xz")
+            grid_yz = _create_grid(size=1.0, divisions=20, plane="yz")
             axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2)
-            vis.add_geometry(grid)
+            vis.add_geometry(grid_xy)
+            vis.add_geometry(grid_xz)
+            vis.add_geometry(grid_yz)
             vis.add_geometry(axis)
             if hasattr(vis, "add_3d_label"):
-                vis.add_3d_label([0.25, 0, 0], "X")
-                vis.add_3d_label([0, 0.25, 0], "Y")
-                vis.add_3d_label([0, 0, 0.25], "Z")
+                vis.add_3d_label([0.25, 0, 0], "Term/Age")
+                vis.add_3d_label([0, 0.25, 0], "Balance")
+                vis.add_3d_label([0, 0, 0.25], "Rate")
 
             vis.get_view_control().convert_from_pinhole_camera_parameters(camera)
     except KeyboardInterrupt:
