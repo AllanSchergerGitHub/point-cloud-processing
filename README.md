@@ -53,6 +53,28 @@ When launched, the script asks whether you want to generate a fresh
 the file or ``n`` to use the existing data. This will open an interactive
 Open3D window displaying the loan portfolio.
 
+### How It Works
+
+Each loan entry from the CSV file is converted to a small sphere positioned at
+``(term/age, balance, rate)``. Spheres are colored green for newly added loans
+and red for loans that have been removed. The script periodically watches the
+CSV file for modifications. When changes are detected, it reloads the data and
+updates the visualization so you can monitor portfolio updates in real time.
+
+### Adjusting Sphere Size
+
+If the spheres appear too large or too small, adjust the radius calculation in
+``CODE/loan_portfolio_visualizer.py`` within the ``loans_to_spheres`` function.
+Around line 114 you will find:
+
+```python
+radius = 0.05 + 0.1 * normalized
+```
+
+Decrease the ``0.05`` base size or the ``0.1`` scaling factor to make spheres
+smaller. Increasing these values will enlarge them. After modifying the file,
+run the script again to see the new sizes.
+
 ## Acknowledgments
 
 These tools are developed after my PhD, in order to try and support developers & researchers in their point cloud processing endavour, from scratch.
