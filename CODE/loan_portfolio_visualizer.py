@@ -1,5 +1,7 @@
 import argparse
 import csv
+import os
+import time
 from typing import Iterable, List
 
 import numpy as np
@@ -65,14 +67,62 @@ def loans_to_spheres(loans: Iterable[dict]) -> List[o3d.geometry.TriangleMesh]:
     return spheres
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Visualize loan portfolio data")
+def _add_spheres_to_visualizer(
+    vis: o3d.visualization.Visualizer, spheres: List[o3d.geometry.TriangleMesh]
+) -> None:
+    """Add spheres and numerical labels to the visualizer."""
+    for idx, sphere in enumerate(spheres):
+        vis.add_geometry(sphere)
+        if idx < 99:
+            vis.add_3d_label(sphere.get_center(), str(idx + 1))
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Visualize loan portfolio data and monitor for updates"
+    )
     parser.add_argument("csv_file", help="CSV file containing loan data")
     args = parser.parse_args()
 
-    loans = load_loans(args.csv_file)
+    csv_path = args.csv_file
+    loans = load_loans(csv_path)
     spheres = loans_to_spheres(loans)
-    o3d.visualization.draw_geometries(spheres)
+
+    vis = o3d.visualization.Visualizer()
+    vis.create_window(window_name="Loan Portfolio")
+    _add_spheres_to_visualizer(vis, spheres)
+    vis.poll_events()
+    vis.update_renderer()
+
+    try:
+        last_mtime = os.path.getmtime(csv_path)
+        prev_loans = loans
+        while True:
+            time.sleep(5)
+            vis.poll_events()
+            vis.update_renderer()
+
+            try:
+                mtime = os.path.getmtime(csv_path)
+            except OSError:
+                continue
+
+            if mtime == last_mtime:
+                continue
+            last_mtime = mtime
+
+            new_loans = load_loans(csv_path)
+            if new_loans == prev_loans:
+                continue
+            prev_loans = new_loans
+
+            vis.clear_geometries()
+            spheres = loans_to_spheres(new_loans)
+            _add_spheres_to_visualizer(vis, spheres)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        vis.destroy_window()
 
 
 if __name__ == "__main__":
