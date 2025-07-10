@@ -97,10 +97,17 @@ def main() -> None:
     try:
         last_mtime = os.path.getmtime(csv_path)
         prev_loans = loans
+        check_interval = 5.0
+        last_check = time.time()
+
         while True:
-            time.sleep(5)
             vis.poll_events()
             vis.update_renderer()
+            time.sleep(0.05)
+
+            if time.time() - last_check < check_interval:
+                continue
+            last_check = time.time()
 
             try:
                 mtime = os.path.getmtime(csv_path)
