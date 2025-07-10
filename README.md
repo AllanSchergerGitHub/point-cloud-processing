@@ -48,7 +48,10 @@ removed. To try it out, run:
 python CODE/loan_portfolio_visualizer.py DATA/loan_data_example.csv
 ```
 
-This will open an interactive Open3D window displaying the loan portfolio.
+When launched, the script asks whether you want to generate a fresh
+``loan_data_example.csv`` with 1,000 random records. Choose ``y`` to overwrite
+the file or ``n`` to use the existing data. This will open an interactive
+Open3D window displaying the loan portfolio.
 
 ## Acknowledgments
 
