@@ -77,6 +77,35 @@ def _add_spheres_to_visualizer(
             vis.add_3d_label(sphere.get_center(), str(idx + 1))
 
 
+def _create_grid(size: float = 1.0, divisions: int = 10) -> o3d.geometry.LineSet:
+    """Return a faint grid in the X-Y plane."""
+    points = []
+    lines = []
+    step = size / divisions
+    origin = -size / 2
+
+    # Lines parallel to the X-axis
+    for i in range(divisions + 1):
+        start = [origin, origin + i * step, 0.0]
+        end = [origin + size, origin + i * step, 0.0]
+        points.extend([start, end])
+        lines.append([len(points) - 2, len(points) - 1])
+
+    # Lines parallel to the Y-axis
+    for i in range(divisions + 1):
+        start = [origin + i * step, origin, 0.0]
+        end = [origin + i * step, origin + size, 0.0]
+        points.extend([start, end])
+        lines.append([len(points) - 2, len(points) - 1])
+
+    line_set = o3d.geometry.LineSet()
+    line_set.points = o3d.utility.Vector3dVector(np.asarray(points))
+    line_set.lines = o3d.utility.Vector2iVector(np.asarray(lines))
+    colors = np.tile([0.7, 0.7, 0.7], (len(lines), 1))
+    line_set.colors = o3d.utility.Vector3dVector(colors)
+    return line_set
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Visualize loan portfolio data and monitor for updates"
@@ -91,6 +120,16 @@ def main() -> None:
     vis = o3d.visualization.Visualizer()
     vis.create_window(window_name="Loan Portfolio")
     _add_spheres_to_visualizer(vis, spheres)
+
+    grid = _create_grid(size=1.0, divisions=20)
+    axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2)
+    vis.add_geometry(grid)
+    vis.add_geometry(axis)
+    if hasattr(vis, "add_3d_label"):
+        vis.add_3d_label([0.25, 0, 0], "X")
+        vis.add_3d_label([0, 0.25, 0], "Y")
+        vis.add_3d_label([0, 0, 0.25], "Z")
+
     vis.poll_events()
     vis.update_renderer()
 
@@ -123,9 +162,21 @@ def main() -> None:
                 continue
             prev_loans = new_loans
 
+            camera = vis.get_view_control().convert_to_pinhole_camera_parameters()
             vis.clear_geometries()
+
             spheres = loans_to_spheres(new_loans)
             _add_spheres_to_visualizer(vis, spheres)
+            grid = _create_grid(size=1.0, divisions=20)
+            axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2)
+            vis.add_geometry(grid)
+            vis.add_geometry(axis)
+            if hasattr(vis, "add_3d_label"):
+                vis.add_3d_label([0.25, 0, 0], "X")
+                vis.add_3d_label([0, 0.25, 0], "Y")
+                vis.add_3d_label([0, 0, 0.25], "Z")
+
+            vis.get_view_control().convert_from_pinhole_camera_parameters(camera)
     except KeyboardInterrupt:
         pass
     finally:
