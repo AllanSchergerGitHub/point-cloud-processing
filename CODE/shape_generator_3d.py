@@ -55,4 +55,5 @@ point_cloud = generate_random_point_cloud(10000, 8)
 pcd = o3d.geometry.PointCloud()
 pcd.points = o3d.utility.Vector3dVector(point_cloud)
 
-# Visualize the point cloudo3d.visualization.draw_geometries([pcd])
+# Visualize the point cloud
+o3d.visualization.draw_geometries([pcd])

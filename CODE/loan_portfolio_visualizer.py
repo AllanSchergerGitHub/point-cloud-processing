@@ -1,5 +1,7 @@
 import argparse
 import csv
+from typing import Iterable, List
+
 import numpy as np
 import open3d as o3d
 
@@ -19,10 +21,21 @@ def load_loans(csv_path):
     return loans
 
 
-def loans_to_point_cloud(loans):
-    """Convert loan records to an Open3D point cloud."""
+def _scale_features(array: np.ndarray) -> np.ndarray:
+    """Scale the feature columns to the [0, 1] range."""
+    mins = array.min(axis=0)
+    maxs = array.max(axis=0)
+    ranges = maxs - mins
+    ranges[ranges == 0] = 1.0
+    return (array - mins) / ranges
+
+
+def loans_to_spheres(loans: Iterable[dict]) -> List[o3d.geometry.TriangleMesh]:
+    """Create scaled spheres for each loan entry."""
     points = []
     colors = []
+    balances = []
+
     for row in loans:
         balance = float(row["loanbalance"])
         rate = float(row["loanrate"])
@@ -32,11 +45,24 @@ def loans_to_point_cloud(loans):
 
         points.append([term_or_age, balance, rate])
         colors.append([0.0, 1.0, 0.0] if added else [1.0, 0.0, 0.0])
+        balances.append(balance)
 
-    cloud = o3d.geometry.PointCloud()
-    cloud.points = o3d.utility.Vector3dVector(np.array(points, dtype=float))
-    cloud.colors = o3d.utility.Vector3dVector(np.array(colors, dtype=float))
-    return cloud
+    points = _scale_features(np.array(points, dtype=float))
+    balances = np.array(balances, dtype=float)
+    min_balance = balances.min()
+    max_balance = balances.max()
+    balance_range = max_balance - min_balance or 1.0
+
+    spheres: List[o3d.geometry.TriangleMesh] = []
+    for idx, point in enumerate(points):
+        normalized = (balances[idx] - min_balance) / balance_range
+        radius = 0.05 + 0.1 * normalized
+        mesh = o3d.geometry.TriangleMesh.create_sphere(radius=radius)
+        mesh.translate(point)
+        mesh.paint_uniform_color(colors[idx])
+        spheres.append(mesh)
+
+    return spheres
 
 
 def main():
@@ -45,8 +71,8 @@ def main():
     args = parser.parse_args()
 
     loans = load_loans(args.csv_file)
-    cloud = loans_to_point_cloud(loans)
-    o3d.visualization.draw_geometries([cloud])
+    spheres = loans_to_spheres(loans)
+    o3d.visualization.draw_geometries(spheres)
 
 
 if __name__ == "__main__":
