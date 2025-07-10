@@ -73,7 +73,7 @@ def _add_spheres_to_visualizer(
     """Add spheres and numerical labels to the visualizer."""
     for idx, sphere in enumerate(spheres):
         vis.add_geometry(sphere)
-        if idx < 99:
+        if idx < 99 and hasattr(vis, "add_3d_label"):
             vis.add_3d_label(sphere.get_center(), str(idx + 1))
 
 

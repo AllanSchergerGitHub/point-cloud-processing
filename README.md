@@ -11,8 +11,12 @@ A computer with internet access, and (optionnally), a Gmail and GDrive account t
 Install the required visualization library before running the examples:
 
 ```bash
-pip install open3d
+pip install "open3d>=0.13"
 ```
+
+If you install an earlier version of Open3D, the numeric labels
+displayed above each sphere will be omitted because the
+`add_3d_label` method was introduced in later versions.
 
 ## Documentation
 
