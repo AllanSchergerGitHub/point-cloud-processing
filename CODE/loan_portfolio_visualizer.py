@@ -1,6 +1,7 @@
 import argparse
 import csv
 import os
+import random
 import time
 from typing import Iterable, List
 
@@ -21,6 +22,58 @@ def load_loans(csv_path):
         for row in reader:
             loans.append(row)
     return loans
+
+
+def _generate_clustered_loans(
+    num_records: int = 1000, clusters: int = 4
+) -> List[dict]:
+    """Return a list of clustered loan records."""
+    records: List[dict] = []
+    base_balance_range = 100_000 - 1_000
+    base_rate_range = 12 - 4
+    base_term_range = 180 - 12
+    cluster_size = num_records // clusters
+
+    for idx in range(clusters):
+        size = cluster_size
+        if idx == clusters - 1:
+            size = num_records - len(records)
+        bal_center = random.uniform(1_000, 100_000)
+        rate_center = random.uniform(4, 12)
+        term_center = random.uniform(12, 180)
+        for _ in range(size):
+            balance = random.gauss(bal_center, base_balance_range / 20)
+            rate = random.gauss(rate_center, base_rate_range / 10)
+            term = random.gauss(term_center, base_term_range / 20)
+            balance = min(max(balance, 1_000), 100_000)
+            rate = min(max(rate, 4), 12)
+            term = int(min(max(term, 12), 180))
+            flag = "added" if random.random() < 0.5 else "removed"
+            records.append(
+                {
+                    "loanbalance": f"{balance:.2f}",
+                    "loanrate": f"{rate:.2f}",
+                    "loanaddedOrRemovedFlag": flag,
+                    "loantermOrAgeInMonths": str(term),
+                }
+            )
+    random.shuffle(records)
+    return records
+
+
+def generate_sample_csv(path: str, num_records: int = 1000, clusters: int = 4) -> None:
+    """Write clustered sample loan data to ``path``."""
+    fieldnames = [
+        "loanbalance",
+        "loanrate",
+        "loanaddedOrRemovedFlag",
+        "loantermOrAgeInMonths",
+    ]
+    data = _generate_clustered_loans(num_records=num_records, clusters=clusters)
+    with open(path, "w", newline="") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(data)
 
 
 def _scale_features(array: np.ndarray) -> np.ndarray:
@@ -133,6 +186,13 @@ def main() -> None:
     args = parser.parse_args()
 
     csv_path = args.csv_file
+    answer = input(
+        "Generate a new dataset with 1,000 sample records? [y/N]: "
+    ).strip().lower()
+    if answer == "y" or (answer == "" and not os.path.exists(csv_path)):
+        generate_sample_csv(csv_path)
+        print(f"Sample data written to {csv_path}")
+
     loans = load_loans(csv_path)
     spheres = loans_to_spheres(loans)
 
