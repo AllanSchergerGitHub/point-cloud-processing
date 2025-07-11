@@ -8,6 +8,9 @@ from typing import Iterable, List
 import numpy as np
 import open3d as o3d
 
+# Default number of records used when generating sample data.
+DEFAULT_NUM_RECORDS = 1000
+
 """Visualize loan portfolio data in 3D using Open3D.
 
 This script requires the :mod:`open3d` package to be installed.
@@ -25,7 +28,7 @@ def load_loans(csv_path):
 
 
 def _generate_clustered_loans(
-    num_records: int = 1000, clusters: int = 4
+    num_records: int = DEFAULT_NUM_RECORDS, clusters: int = 4
 ) -> List[dict]:
     """Return a list of clustered loan records."""
     records: List[dict] = []
@@ -61,7 +64,9 @@ def _generate_clustered_loans(
     return records
 
 
-def generate_sample_csv(path: str, num_records: int = 1000, clusters: int = 4) -> None:
+def generate_sample_csv(
+    path: str, num_records: int = DEFAULT_NUM_RECORDS, clusters: int = 4
+) -> None:
     """Write clustered sample loan data to ``path``."""
     fieldnames = [
         "loanbalance",
@@ -187,7 +192,7 @@ def main() -> None:
 
     csv_path = args.csv_file
     answer = input(
-        "Generate a new dataset with 1,000 sample records? [y/N]: "
+        f"Generate a new dataset with {DEFAULT_NUM_RECORDS:,d} sample records? [y/N]: "
     ).strip().lower()
     if answer == "y" or (answer == "" and not os.path.exists(csv_path)):
         generate_sample_csv(csv_path)
