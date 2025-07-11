@@ -3,5 +3,6 @@
 
 __pycache__/
 
-# PyCharm project files
+# IntelliJ / PyCharm project files
+.idea/
 .iml
