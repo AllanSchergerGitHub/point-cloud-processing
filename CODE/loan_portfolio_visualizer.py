@@ -9,7 +9,7 @@ import numpy as np
 import open3d as o3d
 
 # Default number of records used when generating sample data.
-DEFAULT_NUM_RECORDS = 2500
+DEFAULT_NUM_RECORDS = 5
 
 """Visualize loan portfolio data in 3D using Open3D.
 

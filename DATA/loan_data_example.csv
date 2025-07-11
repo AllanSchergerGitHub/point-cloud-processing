@@ -1,7 +1,6 @@
 loanbalance,loanrate,loanaddedOrRemovedFlag,loantermOrAgeInMonths,cluster
-10000,5.5,added,60,1
-8000,4.2,added,48,1
-5000,6.0,removed,36,2
-15000,3.8,added,72,2
-4000,5.0,removed,24,2
-
+68676.56,5.65,added,42,4
+77935.72,7.64,added,80,2
+63586.15,10.14,added,46,3
+47540.70,7.11,added,59,1
+55521.48,4.20,added,40,4
