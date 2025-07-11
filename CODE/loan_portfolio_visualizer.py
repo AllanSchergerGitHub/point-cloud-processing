@@ -9,7 +9,7 @@ import numpy as np
 import open3d as o3d
 
 # Default number of records used when generating sample data.
-DEFAULT_NUM_RECORDS = 1000
+DEFAULT_NUM_RECORDS = 2500
 
 """Visualize loan portfolio data in 3D using Open3D.
 
@@ -118,7 +118,7 @@ def loans_to_spheres(loans: Iterable[dict]) -> List[o3d.geometry.TriangleMesh]:
     spheres: List[o3d.geometry.TriangleMesh] = []
     for idx, point in enumerate(points):
         normalized = (balances[idx] - min_balance) / balance_range
-        radius = 0.05 + 0.1 * normalized
+        radius = 0.002 + 0.002 * normalized
         mesh = o3d.geometry.TriangleMesh.create_sphere(radius=radius)
         mesh.translate(point)
         mesh.paint_uniform_color(colors[idx])
