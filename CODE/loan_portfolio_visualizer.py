@@ -58,6 +58,7 @@ def _generate_clustered_loans(
                     "loanrate": f"{rate:.2f}",
                     "loanaddedOrRemovedFlag": flag,
                     "loantermOrAgeInMonths": str(term),
+                    "cluster": str(idx + 1),
                 }
             )
     random.shuffle(records)
@@ -73,6 +74,7 @@ def generate_sample_csv(
         "loanrate",
         "loanaddedOrRemovedFlag",
         "loantermOrAgeInMonths",
+        "cluster",
     ]
     data = _generate_clustered_loans(num_records=num_records, clusters=clusters)
     with open(path, "w", newline="") as csvfile:

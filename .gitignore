@@ -1,0 +1,5 @@
+# Ignore generated CSV files
+*.csv
+
+__pycache__/
+
