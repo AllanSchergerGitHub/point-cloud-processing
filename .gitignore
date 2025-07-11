@@ -1,6 +1,5 @@
 # Ignore generated CSV files
 *.csv
-!DATA/loan_data_example.csv
 
 __pycache__/
 
