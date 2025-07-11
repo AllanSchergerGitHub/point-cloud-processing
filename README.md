@@ -49,7 +49,8 @@ python CODE/loan_portfolio_visualizer.py DATA/loan_data_example.csv
 ```
 
 When launched, the script asks whether you want to generate a fresh
-``loan_data_example.csv`` with 1,000 random records. Choose ``y`` to overwrite
+``loan_data_example.csv`` using the default number of sample records
+(``DEFAULT_NUM_RECORDS`` in the script, set to ``1,000``). Choose ``y`` to overwrite
 the file or ``n`` to use the existing data. This will open an interactive
 Open3D window displaying the loan portfolio.
 
