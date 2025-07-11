@@ -1,44 +1,66 @@
-import numpy as np
+"""Plot loan portfolio metrics from a CSV file using Matplotlib."""
+
+import argparse
+import csv
+from typing import List
+
 import matplotlib.pyplot as plt
+import numpy as np
 
-# Set random seed for reproducibility
-np.random.seed(42)
 
-# Parameters from the script
-clusters = 4
-cluster_size = 250
-total_records = clusters * cluster_size
+def load_loans(csv_path: str) -> List[dict]:
+    """Return a list of loan records from ``csv_path``."""
 
-# Ranges from the script
-balance_range = 100000 - 1000
-rate_range = 12 - 4
-term_range = 180 - 12
+    loans: List[dict] = []
+    with open(csv_path, newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            loans.append(row)
+    return loans
 
-# Collect data
-points = []
 
-for _ in range(clusters):
-    bal_center = np.random.uniform(1000, 100000)
-    rate_center = np.random.uniform(4, 12)
-    term_center = np.random.uniform(12, 180)
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Plot loan data from CSV")
+    parser.add_argument("csv_file", help="CSV file containing loan data")
+    args = parser.parse_args()
 
-    for _ in range(cluster_size):
-        balance = np.clip(np.random.normal(bal_center, balance_range / 20), 1000, 100000)
-        rate = np.clip(np.random.normal(rate_center, rate_range / 10), 4, 12)
-        term = np.clip(np.random.normal(term_center, term_range / 20), 12, 180)
-        points.append((term, balance, rate))
+    loans = load_loans(args.csv_file)
 
-points = np.array(points)
+    points = np.array(
+        [
+            [
+                float(row["loantermOrAgeInMonths"]),
+                float(row["loanbalance"]),
+                float(row["loanrate"]),
+            ]
+            for row in loans
+        ],
+        dtype=float,
+    )
+    clusters = np.array([int(row.get("cluster", 0)) for row in loans], dtype=int)
 
-# Plot 3D scatter
-fig = plt.figure(figsize=(10, 7))
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter(points[:, 0], points[:, 1], points[:, 2], alpha=0.6, s=10, c=points[:, 2], cmap='coolwarm')
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(111, projection="3d")
+    sc = ax.scatter(
+        points[:, 0],
+        points[:, 1],
+        points[:, 2],
+        c=clusters,
+        cmap="tab10",
+        alpha=0.6,
+        s=10,
+    )
+    legend1 = ax.legend(*sc.legend_elements(), title="Cluster")
+    ax.add_artist(legend1)
 
-ax.set_xlabel("Term (Months)")
-ax.set_ylabel("Balance ($)")
-ax.set_zlabel("Rate (%)")
-ax.set_title("Loan Clusters: Term vs Balance vs Rate")
+    ax.set_xlabel("Term (Months)")
+    ax.set_ylabel("Balance ($)")
+    ax.set_zlabel("Rate (%)")
+    ax.set_title("Loan Clusters: Term vs Balance vs Rate")
 
-plt.tight_layout()
-plt.show()
+    plt.tight_layout()
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
