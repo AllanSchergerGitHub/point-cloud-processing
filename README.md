@@ -76,6 +76,17 @@ Decrease the ``0.05`` base size or the ``0.1`` scaling factor to make spheres
 smaller. Increasing these values will enlarge them. After modifying the file,
 run the script again to see the new sizes.
 
+### Matplotlib 3D Scatter Plot
+
+A lightweight script, `CODE/plot.py`, is also included for quickly
+visualizing the loan data with Matplotlib. The script requires the
+`matplotlib` package and displays a 3D scatter plot of term, balance
+and rate. Invoke it as follows:
+
+```bash
+python CODE/plot.py DATA/loan_data_example.csv
+```
+
 ## Acknowledgments
 
 These tools are developed after my PhD, in order to try and support developers & researchers in their point cloud processing endavour, from scratch.
