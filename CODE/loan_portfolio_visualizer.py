@@ -138,16 +138,30 @@ def _add_spheres_to_visualizer(
 
 
 def _create_grid(
-    size: float = 1.0, divisions: int = 10, plane: str = "xy"
+    size: float = 1.0,
+    divisions: int = 10,
+    plane: str = "xy",
+    positive_only: bool = False,
 ) -> o3d.geometry.LineSet:
-    """Return a faint grid in one of the principal planes."""
+    """Return a faint grid in one of the principal planes.
+
+    Parameters
+    ----------
+    size : float
+        Length of a side of the grid.
+    divisions : int
+        Number of grid segments.
+    plane : str
+        Plane in which to build the grid ("xy", "xz", or "yz").
+    positive_only : bool
+        If true, the grid originates at 0 instead of being centered."""
     plane = plane.lower()
     if plane not in ("xy", "xz", "yz"):
         raise ValueError("plane must be 'xy', 'xz', or 'yz'")
     points = []
     lines = []
     step = size / divisions
-    origin = -size / 2
+    origin = 0.0 if positive_only else -size / 2
 
     # Lines parallel to the first axis in the plane
     for i in range(divisions + 1):
@@ -206,19 +220,20 @@ def main() -> None:
     vis = o3d.visualization.Visualizer()
     vis.create_window(window_name="Loan Portfolio")
     _add_spheres_to_visualizer(vis, spheres)
+    grid_size = 1.1
 
-    grid_xy = _create_grid(size=1.0, divisions=20, plane="xy")
-    grid_xz = _create_grid(size=1.0, divisions=20, plane="xz")
-    grid_yz = _create_grid(size=1.0, divisions=20, plane="yz")
+    grid_xy = _create_grid(size=grid_size, divisions=10, plane="xy", positive_only=True)
+    grid_xz = _create_grid(size=grid_size, divisions=10, plane="xz", positive_only=True)
+    grid_yz = _create_grid(size=grid_size, divisions=10, plane="yz", positive_only=True)
     axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2)
     vis.add_geometry(grid_xy)
     vis.add_geometry(grid_xz)
     vis.add_geometry(grid_yz)
     vis.add_geometry(axis)
     if hasattr(vis, "add_3d_label"):
-        vis.add_3d_label([0.25, 0, 0], "Term/Age")
-        vis.add_3d_label([0, 0.25, 0], "Balance")
-        vis.add_3d_label([0, 0, 0.25], "Rate")
+        vis.add_3d_label([grid_size * 0.25, 0, 0], "Term/Age")
+        vis.add_3d_label([0, grid_size * 0.25, 0], "Balance")
+        vis.add_3d_label([0, 0, grid_size * 0.25], "Rate")
 
     vis.poll_events()
     vis.update_renderer()
@@ -257,18 +272,18 @@ def main() -> None:
 
             spheres = loans_to_spheres(new_loans)
             _add_spheres_to_visualizer(vis, spheres)
-            grid_xy = _create_grid(size=1.0, divisions=20, plane="xy")
-            grid_xz = _create_grid(size=1.0, divisions=20, plane="xz")
-            grid_yz = _create_grid(size=1.0, divisions=20, plane="yz")
+            grid_xy = _create_grid(size=grid_size, divisions=10, plane="xy", positive_only=True)
+            grid_xz = _create_grid(size=grid_size, divisions=10, plane="xz", positive_only=True)
+            grid_yz = _create_grid(size=grid_size, divisions=10, plane="yz", positive_only=True)
             axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2)
             vis.add_geometry(grid_xy)
             vis.add_geometry(grid_xz)
             vis.add_geometry(grid_yz)
             vis.add_geometry(axis)
             if hasattr(vis, "add_3d_label"):
-                vis.add_3d_label([0.25, 0, 0], "Term/Age")
-                vis.add_3d_label([0, 0.25, 0], "Balance")
-                vis.add_3d_label([0, 0, 0.25], "Rate")
+                vis.add_3d_label([grid_size * 0.25, 0, 0], "Term/Age")
+                vis.add_3d_label([0, grid_size * 0.25, 0], "Balance")
+                vis.add_3d_label([0, 0, grid_size * 0.25], "Rate")
 
             vis.get_view_control().convert_from_pinhole_camera_parameters(camera)
     except KeyboardInterrupt:
