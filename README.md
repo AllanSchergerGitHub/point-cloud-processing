@@ -34,8 +34,8 @@ Documentation of the various scripts can be found on the related articles: [Medi
 
 The repository now includes a small example showing how point-cloud tools can visualize
 loan portfolio metrics. The `loan_portfolio_visualizer.py` script reads a CSV file
-containing `loanbalance`, `loanrate`, `loanaddedOrRemovedFlag`, and
-`loantermOrAgeInMonths` columns. Each loan is mapped to a 3D point where:
+containing `loanbalance`, `loanrate`, `loanaddedOrRemovedFlag`,
+`loantermOrAgeInMonths`, and `cluster` columns. Each loan is mapped to a 3D point where:
 
 * **X** = loan term or age in months
 * **Y** = balance
