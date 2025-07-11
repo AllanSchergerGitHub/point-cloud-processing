@@ -8,6 +8,25 @@ from typing import Iterable, List
 import numpy as np
 import open3d as o3d
 
+
+def _text_mesh(
+    text: str,
+    position: Iterable[float],
+    scale: float = 0.05,
+    color: Iterable[float] | None = None,
+) -> o3d.geometry.TriangleMesh:
+    """Return an extruded 3D text mesh translated to ``position``."""
+    mesh = o3d.geometry.TriangleMesh.create_text_3d(
+        text,
+        depth=0.01,
+        font_size=20,
+    )
+    if color is not None:
+        mesh.paint_uniform_color(list(color))
+    mesh.scale(scale, center=(0.0, 0.0, 0.0))
+    mesh.translate(list(position))
+    return mesh
+
 # Default number of records used when generating sample data.
 DEFAULT_NUM_RECORDS = 2500
 
@@ -230,10 +249,27 @@ def main() -> None:
     vis.add_geometry(grid_xz)
     vis.add_geometry(grid_yz)
     vis.add_geometry(axis)
-    if hasattr(vis, "add_3d_label"):
-        vis.add_3d_label([grid_size * 0.25, 0, 0], "Term/Age")
-        vis.add_3d_label([0, grid_size * 0.25, 0], "Balance")
-        vis.add_3d_label([0, 0, grid_size * 0.25], "Rate")
+    vis.add_geometry(
+        _text_mesh(
+            "Term/Age",
+            [grid_size * 0.25, grid_size * 0.05, 0.0],
+            scale=0.08,
+        )
+    )
+    vis.add_geometry(
+        _text_mesh(
+            "Balance",
+            [grid_size * 0.05, 0.0, grid_size * 0.25],
+            scale=0.08,
+        )
+    )
+    vis.add_geometry(
+        _text_mesh(
+            "Rate",
+            [0.0, grid_size * 0.25, grid_size * 0.05],
+            scale=0.08,
+        )
+    )
 
     vis.poll_events()
     vis.update_renderer()
@@ -280,10 +316,27 @@ def main() -> None:
             vis.add_geometry(grid_xz)
             vis.add_geometry(grid_yz)
             vis.add_geometry(axis)
-            if hasattr(vis, "add_3d_label"):
-                vis.add_3d_label([grid_size * 0.25, 0, 0], "Term/Age")
-                vis.add_3d_label([0, grid_size * 0.25, 0], "Balance")
-                vis.add_3d_label([0, 0, grid_size * 0.25], "Rate")
+            vis.add_geometry(
+                _text_mesh(
+                    "Term/Age",
+                    [grid_size * 0.25, grid_size * 0.05, 0.0],
+                    scale=0.08,
+                )
+            )
+            vis.add_geometry(
+                _text_mesh(
+                    "Balance",
+                    [grid_size * 0.05, 0.0, grid_size * 0.25],
+                    scale=0.08,
+                )
+            )
+            vis.add_geometry(
+                _text_mesh(
+                    "Rate",
+                    [0.0, grid_size * 0.25, grid_size * 0.05],
+                    scale=0.08,
+                )
+            )
 
             vis.get_view_control().convert_from_pinhole_camera_parameters(camera)
     except KeyboardInterrupt:
