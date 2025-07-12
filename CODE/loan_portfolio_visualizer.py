@@ -3,7 +3,7 @@ import csv
 import os
 import random
 import time
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 import numpy as np
 import open3d as o3d
@@ -13,7 +13,7 @@ def _text_mesh(
     text: str,
     position: Iterable[float],
     scale: float = 0.05,
-    color: Iterable[float] | None = None,
+    color: Optional[Iterable[float]] = None,
 ) -> o3d.geometry.TriangleMesh:
     """Return an extruded 3D text mesh translated to ``position``."""
     mesh = o3d.geometry.TriangleMesh.create_text_3d(
@@ -254,6 +254,7 @@ def main() -> None:
             "Term/Age",
             [grid_size * 0.25, grid_size * 0.05, 0.0],
             scale=0.08,
+            color=(1.0, 1.0, 1.0),
         )
     )
     vis.add_geometry(
@@ -261,6 +262,7 @@ def main() -> None:
             "Balance",
             [grid_size * 0.05, 0.0, grid_size * 0.25],
             scale=0.08,
+            color=(1.0, 1.0, 1.0),
         )
     )
     vis.add_geometry(
@@ -268,6 +270,7 @@ def main() -> None:
             "Rate",
             [0.0, grid_size * 0.25, grid_size * 0.05],
             scale=0.08,
+            color=(1.0, 1.0, 1.0),
         )
     )
 
@@ -321,6 +324,7 @@ def main() -> None:
                     "Term/Age",
                     [grid_size * 0.25, grid_size * 0.05, 0.0],
                     scale=0.08,
+                    color=(1.0, 1.0, 1.0),
                 )
             )
             vis.add_geometry(
@@ -328,6 +332,7 @@ def main() -> None:
                     "Balance",
                     [grid_size * 0.05, 0.0, grid_size * 0.25],
                     scale=0.08,
+                    color=(1.0, 1.0, 1.0),
                 )
             )
             vis.add_geometry(
@@ -335,6 +340,7 @@ def main() -> None:
                     "Rate",
                     [0.0, grid_size * 0.25, grid_size * 0.05],
                     scale=0.08,
+                    color=(1.0, 1.0, 1.0),
                 )
             )
 
