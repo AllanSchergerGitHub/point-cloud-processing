@@ -320,6 +320,7 @@ def _create_wall_text(
     return mesh
 
 
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Visualize loan portfolio data and monitor for updates"
@@ -367,12 +368,14 @@ def main() -> None:
         [-0.001, 0.0, 0.0],
         "yz",
     )
+
     wall_label = _create_wall_text(
         "Loan Portfolio",
         [0.05 * grid_size, 0.05 * grid_size, -0.0005],
         plane="xy",
         scale=0.08,
     )
+
     axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2)
     vis.add_geometry(grid_xy)
     vis.add_geometry(grid_xz)
@@ -380,8 +383,10 @@ def main() -> None:
     vis.add_geometry(wall_xy)
     vis.add_geometry(wall_xz)
     vis.add_geometry(wall_yz)
+
     if wall_label is not None:
         vis.add_geometry(wall_label)
+
     vis.add_geometry(axis)
     add_face_titles(vis, grid_size)
 
@@ -446,12 +451,14 @@ def main() -> None:
                 [-0.001, 0.0, 0.0],
                 "yz",
             )
+
             wall_label = _create_wall_text(
                 "Loan Portfolio",
                 [0.05 * grid_size, 0.05 * grid_size, -0.0005],
                 plane="xy",
                 scale=0.08,
             )
+
             axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2)
             vis.add_geometry(grid_xy)
             vis.add_geometry(grid_xz)
@@ -459,8 +466,10 @@ def main() -> None:
             vis.add_geometry(wall_xy)
             vis.add_geometry(wall_xz)
             vis.add_geometry(wall_yz)
+
             if wall_label is not None:
                 vis.add_geometry(wall_label)
+
             vis.add_geometry(axis)
             add_face_titles(vis, grid_size)
 
