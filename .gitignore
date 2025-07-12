@@ -6,3 +6,9 @@ __pycache__/
 # IntelliJ / PyCharm project files
 .idea/
 .iml
+
+# Ignore python environments
+.venv*/
+venv*/
+ENV*/
+env*/
