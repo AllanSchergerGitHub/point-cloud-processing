@@ -293,6 +293,34 @@ def _create_background_wall(
     return mesh
 
 
+def _create_wall_text(
+    text: str,
+    position: List[float],
+    plane: str = "xy",
+    scale: float = 0.05,
+    color=(1.0, 1.0, 1.0),
+) -> Optional[o3d.geometry.TriangleMesh]:
+    """Return a text mesh oriented on the given plane."""
+
+    mesh = _text_mesh(text, [0.0, 0.0, 0.0], scale=scale, color=color)
+    if mesh is None:
+        return None
+
+    plane = plane.lower()
+    if plane == "xz":
+        rot = o3d.geometry.get_rotation_matrix_from_xyz((np.pi / 2, 0.0, 0.0))
+        mesh.rotate(rot, center=(0.0, 0.0, 0.0))
+    elif plane == "yz":
+        rot = o3d.geometry.get_rotation_matrix_from_xyz((0.0, np.pi / 2, 0.0))
+        mesh.rotate(rot, center=(0.0, 0.0, 0.0))
+    elif plane != "xy":
+        raise ValueError("plane must be 'xy', 'xz', or 'yz'")
+
+    mesh.translate(list(position))
+    return mesh
+
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Visualize loan portfolio data and monitor for updates"
@@ -340,6 +368,14 @@ def main() -> None:
         [-0.001, 0.0, 0.0],
         "yz",
     )
+
+    wall_label = _create_wall_text(
+        "Loan Portfolio",
+        [0.05 * grid_size, 0.05 * grid_size, -0.0005],
+        plane="xy",
+        scale=0.08,
+    )
+
     axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2)
     vis.add_geometry(grid_xy)
     vis.add_geometry(grid_xz)
@@ -347,6 +383,10 @@ def main() -> None:
     vis.add_geometry(wall_xy)
     vis.add_geometry(wall_xz)
     vis.add_geometry(wall_yz)
+
+    if wall_label is not None:
+        vis.add_geometry(wall_label)
+
     vis.add_geometry(axis)
     add_face_titles(vis, grid_size)
 
@@ -411,6 +451,14 @@ def main() -> None:
                 [-0.001, 0.0, 0.0],
                 "yz",
             )
+
+            wall_label = _create_wall_text(
+                "Loan Portfolio",
+                [0.05 * grid_size, 0.05 * grid_size, -0.0005],
+                plane="xy",
+                scale=0.08,
+            )
+
             axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2)
             vis.add_geometry(grid_xy)
             vis.add_geometry(grid_xz)
@@ -418,6 +466,10 @@ def main() -> None:
             vis.add_geometry(wall_xy)
             vis.add_geometry(wall_xz)
             vis.add_geometry(wall_yz)
+
+            if wall_label is not None:
+                vis.add_geometry(wall_label)
+
             vis.add_geometry(axis)
             add_face_titles(vis, grid_size)
 
