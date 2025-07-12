@@ -11,13 +11,43 @@ import numpy as np
 import open3d as o3d
 
 
+def _add_axis_labels(vis: o3d.visualization.Visualizer, grid_size: float) -> None:
+    """Display axis labels using the best method supported by Open3D."""
+    labels = {
+        "Term/Age": [grid_size * 0.25, grid_size * 0.05, 0.0],
+        "Balance": [grid_size * 0.05, 0.0, grid_size * 0.25],
+        "Rate": [0.0, grid_size * 0.25, grid_size * 0.05],
+    }
+
+    if hasattr(o3d.geometry.TriangleMesh, "create_text_3d"):
+        for text, pos in labels.items():
+            mesh = _text_mesh(text, pos, scale=0.08, color=(1.0, 1.0, 1.0))
+            if mesh is not None:
+                vis.add_geometry(mesh)
+    elif hasattr(vis, "add_3d_label"):
+        for text, pos in labels.items():
+            vis.add_3d_label(pos, text)
+    else:
+        # No supported method for text rendering.
+        pass
+
 def _text_mesh(
     text: str,
     position: Iterable[float],
     scale: float = 0.05,
     color: Optional[Iterable[float]] = None,
-) -> o3d.geometry.TriangleMesh:
-    """Return an extruded 3D text mesh translated to ``position``."""
+) -> Optional[o3d.geometry.TriangleMesh]:
+    """Return an extruded 3D text mesh translated to ``position``.
+
+    If the current Open3D installation does not provide the
+    ``TriangleMesh.create_text_3d`` method, ``None`` is returned and the
+    caller should fall back to 2D labels if available.
+    """
+
+    if not hasattr(o3d.geometry.TriangleMesh, "create_text_3d"):
+        # Older Open3D versions (<0.20) do not support 3D text meshes.
+        return None
+
     mesh = o3d.geometry.TriangleMesh.create_text_3d(
         text,
         depth=0.01,
@@ -251,30 +281,7 @@ def main() -> None:
     vis.add_geometry(grid_xz)
     vis.add_geometry(grid_yz)
     vis.add_geometry(axis)
-    vis.add_geometry(
-        _text_mesh(
-            "Term/Age",
-            [grid_size * 0.25, grid_size * 0.05, 0.0],
-            scale=0.08,
-            color=(1.0, 1.0, 1.0),
-        )
-    )
-    vis.add_geometry(
-        _text_mesh(
-            "Balance",
-            [grid_size * 0.05, 0.0, grid_size * 0.25],
-            scale=0.08,
-            color=(1.0, 1.0, 1.0),
-        )
-    )
-    vis.add_geometry(
-        _text_mesh(
-            "Rate",
-            [0.0, grid_size * 0.25, grid_size * 0.05],
-            scale=0.08,
-            color=(1.0, 1.0, 1.0),
-        )
-    )
+    _add_axis_labels(vis, grid_size)
 
     vis.poll_events()
     vis.update_renderer()
@@ -321,30 +328,7 @@ def main() -> None:
             vis.add_geometry(grid_xz)
             vis.add_geometry(grid_yz)
             vis.add_geometry(axis)
-            vis.add_geometry(
-                _text_mesh(
-                    "Term/Age",
-                    [grid_size * 0.25, grid_size * 0.05, 0.0],
-                    scale=0.08,
-                    color=(1.0, 1.0, 1.0),
-                )
-            )
-            vis.add_geometry(
-                _text_mesh(
-                    "Balance",
-                    [grid_size * 0.05, 0.0, grid_size * 0.25],
-                    scale=0.08,
-                    color=(1.0, 1.0, 1.0),
-                )
-            )
-            vis.add_geometry(
-                _text_mesh(
-                    "Rate",
-                    [0.0, grid_size * 0.25, grid_size * 0.05],
-                    scale=0.08,
-                    color=(1.0, 1.0, 1.0),
-                )
-            )
+            _add_axis_labels(vis, grid_size)
 
             vis.get_view_control().convert_from_pinhole_camera_parameters(camera)
     except KeyboardInterrupt:

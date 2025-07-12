@@ -18,7 +18,10 @@ pip install -r requirements.txt
 If you install an earlier version of Open3D than the one listed in
 ``requirements.txt``, the numeric labels displayed above each sphere
 will be omitted because the ``add_3d_label`` method was introduced in
-later versions.
+later versions. Similarly, axis titles rely on the
+``TriangleMesh.create_text_3d`` API added in more recent Open3D
+releases. When this function is unavailable, the script falls back to
+lighter 3D labels or omits the titles entirely.
 
 ## Documentation
 
