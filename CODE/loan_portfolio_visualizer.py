@@ -31,6 +31,31 @@ def _add_axis_labels(vis: o3d.visualization.Visualizer, grid_size: float) -> Non
         # No supported method for text rendering.
         pass
 
+
+def add_face_titles(
+    vis: o3d.visualization.Visualizer,
+    grid_size: float,
+    scale: float = 0.07,
+    color=(1.0, 1.0, 1.0),
+) -> None:
+    """Place one title on each positive-axis face of the grid."""
+
+    if not hasattr(o3d.geometry.TriangleMesh, "create_text_3d"):
+        return  # Old Open3D build – silently skip
+
+    eps = 0.03 * grid_size
+    half = 0.5 * grid_size
+
+    definitions = [
+        ("Term/Age", [half, -eps, 0.0]),
+        ("Balance", [-eps, half, 0.0]),
+        ("Rate", [-eps, -eps, half]),
+    ]
+
+    for text, pos in definitions:
+        mesh = _text_mesh(text, pos, scale=scale, color=color)
+        vis.add_geometry(mesh)
+
 def _text_mesh(
     text: str,
     position: Iterable[float],
@@ -60,7 +85,7 @@ def _text_mesh(
     return mesh
 
 # Default number of records used when generating sample data.
-DEFAULT_NUM_RECORDS = 2500
+DEFAULT_NUM_RECORDS = 500
 
 """Visualize loan portfolio data in 3D using Open3D.
 
@@ -281,7 +306,7 @@ def main() -> None:
     vis.add_geometry(grid_xz)
     vis.add_geometry(grid_yz)
     vis.add_geometry(axis)
-    _add_axis_labels(vis, grid_size)
+    add_face_titles(vis, grid_size)
 
     vis.poll_events()
     vis.update_renderer()
@@ -328,7 +353,7 @@ def main() -> None:
             vis.add_geometry(grid_xz)
             vis.add_geometry(grid_yz)
             vis.add_geometry(axis)
-            _add_axis_labels(vis, grid_size)
+            add_face_titles(vis, grid_size)
 
             vis.get_view_control().convert_from_pinhole_camera_parameters(camera)
     except KeyboardInterrupt:

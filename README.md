@@ -5,7 +5,7 @@ A suite of scripts and easy-to-follow tutorial to process point cloud data with 
 ## Prerequisites
 
 A computer with internet access, and (optionnally), a Gmail and GDrive account to make it work out of the box.
-Python 3.8 or later.
+Python 3.11 or later.
 
 ## Installing
 
@@ -15,7 +15,7 @@ Install the required libraries before running the examples:
 pip install -r requirements.txt
 ```
 
-If you install an earlier version of Open3D than the one listed in
+If you install an earlier version of Open3D than ``0.19.0`` listed in
 ``requirements.txt``, the numeric labels displayed above each sphere
 will be omitted because the ``add_3d_label`` method was introduced in
 later versions. Similarly, axis titles rely on the
