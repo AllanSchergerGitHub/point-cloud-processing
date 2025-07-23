@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import csv
 from typing import Iterable, List
 
 import numpy as np
@@ -10,15 +9,14 @@ import open3d as o3d
 import open3d.visualization.gui as gui
 import open3d.visualization.rendering as rendering
 
-
-def load_loans(csv_path: str) -> List[dict]:
-    """Return a list of loan records from ``csv_path``."""
-    loans: List[dict] = []
-    with open(csv_path, newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            loans.append(row)
-    return loans
+from loan_portfolio_visualizer import (
+    load_loans,
+    loans_to_spheres,
+    _create_background_wall,
+    _create_grid,
+    _create_wall_text,
+    add_face_titles,
+)
 
 
 def loan_stats(loans: Iterable[dict]) -> dict:
@@ -32,28 +30,6 @@ def loan_stats(loans: Iterable[dict]) -> dict:
         "avg_rate": float(rates.mean()) if len(rates) else 0.0,
         "avg_term": float(terms.mean()) if len(terms) else 0.0,
     }
-
-
-def loans_to_point_cloud(
-    loans: Iterable[dict], x: str, y: str, z: str
-) -> o3d.geometry.PointCloud:
-    """Return a :class:`~open3d.geometry.PointCloud` for the given axis mapping."""
-    points = []
-    colors = []
-    for row in loans:
-        points.append([
-            float(row[x]),
-            float(row[y]),
-            float(row[z]),
-        ])
-        flag = row.get("loanaddedOrRemovedFlag", "").strip().lower()
-        added = flag in ("added", "new", "1", "true", "yes")
-        colors.append([0.0, 1.0, 0.0] if added else [1.0, 0.0, 0.0])
-
-    pc = o3d.geometry.PointCloud()
-    pc.points = o3d.utility.Vector3dVector(np.asarray(points, dtype=float))
-    pc.colors = o3d.utility.Vector3dVector(np.asarray(colors, dtype=float))
-    return pc
 
 
 class Dashboard:
@@ -157,17 +133,72 @@ class Dashboard:
         self._update_scene()
 
     def _update_scene(self) -> None:
-        pc = loans_to_point_cloud(self.loans, self.x_col, self.y_col, self.z_col)
-        mat = rendering.MaterialRecord()
-        mat.shader = "defaultUnlit"
+        spheres = loans_to_spheres(
+            self.loans, self.x_col, self.y_col, self.z_col
+        )
+        mesh_mat = rendering.MaterialRecord()
+        mesh_mat.shader = "defaultLit"
+
+        line_mat = rendering.MaterialRecord()
+        line_mat.shader = "unlitLine"
 
         self.scene.scene.clear_geometry()
-        self.scene.scene.add_geometry("loans", pc, mat)
-        bounds = pc.get_axis_aligned_bounding_box()
-        self.center = bounds.get_center()
-        extent = bounds.get_extent() if hasattr(bounds, "get_extent") else bounds.extent
+
+        for idx, sphere in enumerate(spheres):
+            self.scene.scene.add_geometry(f"sphere_{idx}", sphere, mesh_mat)
+
+        grid_size = 1.1
+        grid_xy = _create_grid(size=grid_size, divisions=10, plane="xy", positive_only=True)
+        grid_xz = _create_grid(size=grid_size, divisions=10, plane="xz", positive_only=True)
+        grid_yz = _create_grid(size=grid_size, divisions=10, plane="yz", positive_only=True)
+        wall_xy = _create_background_wall(
+            grid_size,
+            grid_size,
+            0.001,
+            [0.0, 0.0, -0.001],
+            "xy",
+        )
+        wall_xz = _create_background_wall(
+            grid_size,
+            0.001,
+            grid_size,
+            [0.0, -0.001, 0.0],
+            "xz",
+        )
+        wall_yz = _create_background_wall(
+            0.001,
+            grid_size,
+            grid_size,
+            [-0.001, 0.0, 0.0],
+            "yz",
+        )
+
+        self.scene.scene.add_geometry("grid_xy", grid_xy, line_mat)
+        self.scene.scene.add_geometry("grid_xz", grid_xz, line_mat)
+        self.scene.scene.add_geometry("grid_yz", grid_yz, line_mat)
+        self.scene.scene.add_geometry("wall_xy", wall_xy, mesh_mat)
+        self.scene.scene.add_geometry("wall_xz", wall_xz, mesh_mat)
+        self.scene.scene.add_geometry("wall_yz", wall_yz, mesh_mat)
+
+        label = _create_wall_text(
+            "Loan Portfolio", [0.05 * grid_size, 0.05 * grid_size, -0.0005], plane="xy", scale=0.08
+        )
+        if label is not None:
+            self.scene.scene.add_geometry("label", label, mesh_mat)
+
+        add_face_titles(self.scene.scene, grid_size)
+
+        all_geometry = spheres + [grid_xy, grid_xz, grid_yz, wall_xy, wall_xz, wall_yz]
+        if label is not None:
+            all_geometry.append(label)
+        bbox = all_geometry[0].get_axis_aligned_bounding_box()
+        for g in all_geometry[1:]:
+            bbox += g.get_axis_aligned_bounding_box()
+
+        self.center = bbox.get_center()
+        extent = bbox.get_extent()
         self.radius = max(extent) * 1.5
-        self.scene.setup_camera(60.0, bounds, self.center)
+        self.scene.setup_camera(60.0, bbox, self.center)
         self._update_rotation()
 
     def _update_rotation(self, value: float = 0.0) -> None:  # noqa: D401
