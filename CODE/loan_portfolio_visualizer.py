@@ -168,20 +168,35 @@ def _scale_features(array: np.ndarray) -> np.ndarray:
     return (array - mins) / ranges
 
 
-def loans_to_spheres(loans: Iterable[dict]) -> List[o3d.geometry.TriangleMesh]:
-    """Create scaled spheres for each loan entry."""
+def loans_to_spheres(
+    loans: Iterable[dict],
+    x: str = "loantermOrAgeInMonths",
+    y: str = "loanbalance",
+    z: str = "loanrate",
+) -> List[o3d.geometry.TriangleMesh]:
+    """Create scaled spheres for each loan entry.
+
+    Parameters
+    ----------
+    loans
+        Iterable of loan dictionaries.
+    x, y, z
+        Column names mapping to the X, Y and Z axes.
+    """
+
     points = []
     colors = []
     balances = []
 
     for row in loans:
         balance = float(row["loanbalance"])
-        rate = float(row["loanrate"])
-        term_or_age = float(row["loantermOrAgeInMonths"])
+        px = float(row[x])
+        py = float(row[y])
+        pz = float(row[z])
         flag = row["loanaddedOrRemovedFlag"].strip().lower()
         added = flag in ("added", "new", "1", "true", "yes")
 
-        points.append([term_or_age, balance, rate])
+        points.append([px, py, pz])
         colors.append([0.0, 1.0, 0.0] if added else [1.0, 0.0, 0.0])
         balances.append(balance)
 

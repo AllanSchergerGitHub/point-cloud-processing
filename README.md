@@ -92,6 +92,19 @@ and rate. Invoke it as follows:
 python CODE/plot.py DATA/loan_data_example.csv
 ```
 
+### Interactive Dashboard
+
+The `CODE/loan_dashboard.py` script launches an Open3D-based
+dashboard that displays the same 3D view produced by
+`loan_portfolio_visualizer.py` while exposing widgets to
+rotate the camera, choose which columns map to the X, Y and Z axes and
+inspect basic statistics about the dataset.
+Run it with:
+
+```bash
+python CODE/loan_dashboard.py DATA/loan_data_example.csv
+```
+
 ## Acknowledgments
 
 These tools are developed after my PhD, in order to try and support developers & researchers in their point cloud processing endavour, from scratch.
