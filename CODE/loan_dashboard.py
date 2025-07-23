@@ -82,6 +82,7 @@ class Dashboard:
         self.x_combo = gui.Combobox()
         for key in self._numeric_keys():
             self.x_combo.add_item(key)
+        self.x_combo.selected_text = self.x_col
         self.x_combo.set_on_selection_changed(self._update_axes)
         self.panel.add_child(self.x_combo)
 
@@ -89,6 +90,7 @@ class Dashboard:
         self.y_combo = gui.Combobox()
         for key in self._numeric_keys():
             self.y_combo.add_item(key)
+        self.y_combo.selected_text = self.y_col
         self.y_combo.set_on_selection_changed(self._update_axes)
         self.panel.add_child(self.y_combo)
 
@@ -96,6 +98,7 @@ class Dashboard:
         self.z_combo = gui.Combobox()
         for key in self._numeric_keys():
             self.z_combo.add_item(key)
+        self.z_combo.selected_text = self.z_col
         self.z_combo.set_on_selection_changed(self._update_axes)
         self.panel.add_child(self.z_combo)
 
@@ -162,7 +165,8 @@ class Dashboard:
         self.scene.scene.add_geometry("loans", pc, mat)
         bounds = pc.get_axis_aligned_bounding_box()
         self.center = bounds.get_center()
-        self.radius = max(bounds.extent) * 1.5
+        extent = bounds.get_extent() if hasattr(bounds, "get_extent") else bounds.extent
+        self.radius = max(extent) * 1.5
         self.scene.setup_camera(60.0, bounds, self.center)
         self._update_rotation()
 
