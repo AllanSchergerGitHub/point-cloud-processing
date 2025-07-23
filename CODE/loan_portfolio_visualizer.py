@@ -82,6 +82,7 @@ def _text_mesh(
         mesh.paint_uniform_color(list(color))
     mesh.scale(scale, center=(0.0, 0.0, 0.0))
     mesh.translate(list(position))
+    mesh.compute_vertex_normals()
     return mesh
 
 # Default number of records used when generating sample data.
@@ -213,6 +214,7 @@ def loans_to_spheres(
         mesh = o3d.geometry.TriangleMesh.create_sphere(radius=radius)
         mesh.translate(point)
         mesh.paint_uniform_color(colors[idx])
+        mesh.compute_vertex_normals()
         spheres.append(mesh)
 
     return spheres
@@ -305,6 +307,7 @@ def _create_background_wall(
     )
     mesh.paint_uniform_color(list(color))
     mesh.translate(offset)
+    mesh.compute_vertex_normals()
     return mesh
 
 
